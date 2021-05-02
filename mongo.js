@@ -23,107 +23,12 @@ export async function getAllGames() {
 export async function getAllReviews() {
     let reviews = await Reviews.find({});
 
-    console.log(reviews);
+    //console.log(reviews);
     
-    return;
+    return reviews;
 }
 
-export async function createUser(username, password) {
-    let user = await User.findOne({ username }).exec();
-    
-    if (user) {
-        console.log('ERROR: User already exists');
-        return;
-    }
-
-    let hashed = saltPassword(password);
-
-    let newUser = new User({
-        username,
-        password: hashed
-    });
-
-    let result = await newUser.save();
-    console.log('USER ADDED:  ', result);
-}
-
-export async function updateUsername(oldusername, newusername) {
-    let currUser = await User.findOne({ username: oldusername }).exec();
-
-    if (!currUser) {
-        console.log('ERROR: User Not Found. Please enter a valid username');
-        return;
-    }
-
-    let newUser = await User.findOne({ username: newusername }).exec();
-    if (newUser) {
-        console.log('ERROR: User already exists. Please enter a different username');
-        return;
-    }
-
-    let res = await User.updateOne({ username: oldusername }, { username: newusername }).exec();
-    console.log('Username UPDATED   ', res);
-}
-
-export async function updatePassword(username, newpassword) {
-    let currUser = await User.findOne({ username }).exec();
-
-    if (!currUser) {
-        console.log('ERROR: User Not Found. Please enter a valid username');
-        return;
-    }
-    
-    const match = await bcrypt.compare(newpassword, currUser.password);
-
-    if (match) {
-        console.log('ERROR: Password matches current password for user. Please enter a different password');
-        return;
-    }
-
-    let hashed = saltPassword(newpassword);
-
-    let res = await User.updateOne({ username }, { password: hashed });
-    console.log('Password UPDATED    ', res);
-}
-
-export async function getUserByUsername(username) {
-    let currUser = await User.findOne({ username }).exec();
-
-    if (!currUser) {
-        console.log('ERROR: User Not Found. Please enter a valid username');
-        return;
-    }
-
-    console.log('User Found:   ', currUser);
-}
-
-export async function deleteUserByUsername(username) {
-    let currUser = await User.findOne({ username }).exec();
-
-    if (!currUser) {
-        console.log('ERROR: User Not Found. Please enter a valid username');
-        return;
-    }
-
-    let res = await User.deleteOne({ username });
-    console.log('User DELETED     ', res);
-}
-
-export async function setUsersSteamID(username, steamID) {
-    let currUser = await User.findOne({ username }).exec();
-
-    if (!currUser) {
-        console.log('ERROR: User Not Found. Please enter a valid username');
-        return;
-    }
-
-    currUser.steamUserID = steamID;
-
-    let res = await currUser.save();
-    console.log('User Steam ID UPDATED    ', res);
-}
-
-export async function createGame(title, perc_rec, num_reviewers, game_img_url, override = false) {
+export async function createGame(game_id, title, perc_rec, n_reviewers, game_img_url, override = false) {
     let game = await Games.find({ game_title: title });
 
     if (game.length > 0) {
@@ -132,67 +37,67 @@ export async function createGame(title, perc_rec, num_reviewers, game_img_url, o
     }
 
     let newGame = new Games({
+        _id: game_id,
         game_title: title,
         percent_recommended: perc_rec,
-        num_reviewers,
-        game_img_url
+        num_reviewers: n_reviewers,
+        game_image_url: game_img_url
     });
 
     let res = await newGame.save();
-    console.log('Game CREATED:  ', res);
+    // console.log('Game CREATED:  ', res);
+    return res;
 }
 
 // might want to improve this with some Regex or partial search or something instead of having to do exact match
 export async function getGamesByTitle(title) {
     let games = await Games.find({ game_title: title });
 
-    console.log('Games with title - ', title, '\n', games);
+    // console.log('Games with title - ', title, '\n', games);
+    return games;
 }
 
-export async function filterGamesByPercentRecommended() {
-
+export async function filterGamesByPercentRecommended(perc) {
+    let games = await Games.find({ percent_recommended: perc });
+    return games;
 }
 
-export async function filterGamesByNumReviewers() {
-
+export async function filterGamesByNumReviewers(nr) {
+    let games = await Games.find({ num_reviewers: nr });
+    return games;
 }
 
 export async function sortGamesByTitle() {
-
+    let games = await Games.aggregate([{ $sort : { title: -1 } }]);
+    return games;
 }
 
 export async function sortGamesByPercentRecommended() {
-
+    let games = await Games.aggregate([{ $sort : { title: -1 } }]);
+    return games;
 }
 
 export async function sortGamesByNumReviwers() {
-
+    let games = await Games.aggregate([{ $sort : { num_reviewers: -1 } }]);
+    return games;
 }
 
-export async function updateGameTitle() {
-
+export async function updateGameTitle(gid, new_title) {
+    let result = await Games.update_one({_id: gid}, {$set: { title: new_title } });
+    return result;
 }
 
-export async function updateGamePercentRecommended() {
-
+export async function updateGamePercentRecommended(gid, perc) {
+    let result = await Games.update_one({_id: gid}, {$set: { percent_recommended: perc } });
+    return result;
 }
 
-export async function updateGameReviewers() {
-    
+export async function updateGameReviewers(gid, nrev) {
+    let result = await Games.update_one({_id: gid}, {$set: { num_reviewers: nrev } });
+    return result;
 }
 
-export async function updateGameImgURL() {
-
-}
-
-export async function verifyUser(username, password) {
-    let currUser = await User.findOne({ username }).exec();
-
-    if (!currUser) return false;
-
-    const match = await bcrypt.compare(password, currUser.password);
-
-    if (!match) return false;
-
-    return currUser;
+export async function updateGameImgURL(gid, url) {
+    let result = await Games.update_one({_id: gid}, {$set: { game_image_url: url } });
+    return result;
 }
