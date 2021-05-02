@@ -1,0 +1,25 @@
+{
+  "name": "frontend-cli",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "bin": {
+    "steam-games": "./index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "async-redis": "^1.1.7",
+    "bcryptjs": "^2.4.3",
+    "esm": "^3.2.25",
+    "minimist": "^1.2.5",
+    "mongoose": "^5.12.5",
+    "orientjs": "^3.0.11",
+    "redis": "^3.1.2",
+    "yargs": "^16.2.0"
+  }
+}
