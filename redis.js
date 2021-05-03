@@ -13,12 +13,14 @@ export async function getUserById(username) {
 
 export async function getLikedGamesByUserId(userId, low = 0, high = -1) {
     let userToReturn = await client.smembers(userId + USER_LIKED_BASE);
-    console.log(userToReturn);
+    
+    return userToReturn;
 }
 
 export async function getDislikedGamesByUserId(userId, low = 0, high = -1) {
     let userToReturn = await client.smembers(userId + USER_DISLIKED_BASE);
-    console.log(userToReturn);
+
+        return userToReturn;
 }
 
 export async function login(username, password) {
@@ -26,18 +28,16 @@ export async function login(username, password) {
 
     if (status == false) {
         console.log('User not found!');
-        return;
+        return 'User not found!';
     }
-
-    console.log('status   ', status);
 
     if (!status.steamUserID) {
         console.log('Please associate a steam user id');
-        return;
+        return 'Please associate a steam user id';
     }
 
     let loggedInUser = await client.hset(status.steamUserID, 'username', username, 'password', password);
-    console.log(`loggedInUser`, loggedInUser);
+    return loggedInUser;
 }
 
 export async function addGamesToLikedList(steamID, gameID) {
@@ -45,8 +45,10 @@ export async function addGamesToLikedList(steamID, gameID) {
     
     if (gameList == 1) {
         console.log('Game Successfully ADDED')
+        return true;
     } else {
         console.log('ERROR: Game already exists in set')
+        return false;
     }
 }
 
@@ -55,8 +57,10 @@ export async function deleteGameFromLikedList(steamID, gameID) {
     
     if (gameList == 1) {
         console.log('Game Successfully REMOVED')
+        return true;
     } else {
         console.log('ERROR: Game does not exist in set')
+        return false;
     }
 }
 
@@ -65,8 +69,10 @@ export async function addGameToDislikedList(steamID, gameID) {
     
     if (gameList == 1) {
         console.log('Game Successfully ADDED')
+        return true;
     } else {
         console.log('ERROR: Game already exists in set')
+        return false;
     }
 }
 
@@ -75,7 +81,9 @@ export async function deleteGameFromDislikedList(steamID, gameID) {
     
     if (gameList == 1) {
         console.log('Game Successfully REMOVED')
+        return true;
     } else {
         console.log('ERROR: Game does not exist in set')
+        return false;
     }
 }
